@@ -4,53 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quantira eSign Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #2c9cfb;
             --primary-hover: #1a86db;
-            --bg: #f0f2f5;
-            --panel: #ffffff;
-            --text: #1a1a1a;
-            --text-light: #666;
-            --border: #d1d5db;
+            --bg-app: #f3f4f6;
+            --bg-panel: #ffffff;
+            --text-main: #111827;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
         }
 
+        * { box-sizing: border-box; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-app);
             margin: 0;
-            padding: 0;
             height: 100vh;
             display: flex;
             flex-direction: column;
-            color: var(--text);
+            color: var(--text-main);
+            overflow: hidden;
         }
 
         /* Header */
         header {
-            background: var(--panel);
-            padding: 15px 30px;
+            background: var(--bg-panel);
+            height: 64px;
+            padding: 0 24px;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            z-index: 10;
+            flex-shrink: 0;
         }
 
-        .brand { 
-            font-weight: 700; 
-            font-size: 20px; 
-            color: #000; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        
-        .brand svg {
-            height: 40px;
-            width: auto;
-        }
+
+        .brand svg { height: 32px; width: auto; }
 
         .brand-text {
             display: flex;
@@ -58,117 +58,162 @@
             line-height: 1.1;
         }
         
-        .brand-title { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
-      
+        .brand-title { font-size: 16px; font-weight: 700; color: var(--text-main); }
+        .brand-sub { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .help-btn {
+        .btn-icon {
             background: transparent;
             border: 1px solid var(--border);
-            padding: 8px 16px;
+            color: var(--text-secondary);
+            padding: 8px 12px;
             border-radius: 6px;
-            cursor: pointer;
             font-size: 13px;
-            font-weight: 600;
-            color: var(--text);
-            transition: 0.2s;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .help-btn:hover { background: #f9fafb; border-color: #9ca3af; }
+        .btn-icon:hover { background: #f3f4f6; color: var(--text-main); border-color: #d1d5db; }
 
-        /* Main Layout */
-        .workspace {
+        /* Layout */
+        .main-container {
             display: flex;
             flex: 1;
             overflow: hidden;
         }
 
-        /* Left Panel: Editor */
-        .editor-panel {
-            width: 350px;
-            background: var(--panel);
+        /* Sidebar Editor */
+        .sidebar {
+            width: 340px;
+            background: var(--bg-panel);
             border-right: 1px solid var(--border);
-            padding: 25px;
+            padding: 24px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
+            flex-shrink: 0;
         }
 
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        label { font-size: 12px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
-        input {
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .input-group input {
             padding: 10px 12px;
             border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 14px;
+            font-family: inherit;
             transition: 0.2s;
             width: 100%;
-            box-sizing: border-box;
         }
-        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(44, 156, 251, 0.1); }
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 156, 251, 0.1);
+        }
 
-        /* Right Panel: Preview */
-        .preview-panel {
+        /* Preview Area - Grid Layout per User Request */
+        .preview-area {
             flex: 1;
             background: #e5e7eb;
-            padding: 40px;
+            padding: 30px;
             overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
+            display: grid;
+            grid-template-columns: 1fr 380px; /* Left Column (Flex) | Right Column (Mobile) */
+            grid-template-rows: auto 1fr;     /* Top Row (Message) | Bottom Row (Desktop) */
+            gap: 20px;
+            align-content: start;
         }
 
+        /* Common Card Style */
         .preview-card {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 800px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        .preview-label {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-light);
-            margin-bottom: 15px;
+        .card-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            background: #fafafa;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
-        .preview-container {
-            background: #fff;
-            padding: 20px;
-            border: 1px dashed #ccc;
-            border-radius: 4px;
-        }
+        .card-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
         
-        /* Mobile Simulation */
-        .mobile-wrapper {
-            width: 375px;
+        .card-body { padding: 30px; flex: 1; }
+
+        /* Specific Placements based on Diagram */
+        
+        /* 1. Welcome Message (Top Left) */
+        .welcome-message-card {
+            grid-column: 1 / 2;
+            grid-row: 1 / 2;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .welcome-text h3 { margin: 0 0 8px 0; font-size: 18px; color: var(--text-main); }
+        .welcome-text p { margin: 0; font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+        .info-badge {
+            background: #eff6ff;
+            color: #1d4ed8;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #bfdbfe;
+        }
+
+        /* 2. Desktop Preview (Bottom Left) */
+        .desktop-card {
+            grid-column: 1 / 2;
+            grid-row: 2 / 3;
+        }
+
+        /* 3. Mobile Preview (Right Column - Spans Both Rows) */
+        .mobile-card {
+            grid-column: 2 / 3;
+            grid-row: 1 / 3;
+            height: fit-content;
+            align-self: start;
+        }
+
+        /* Mobile Mockup Styling */
+        .mobile-mockup {
+            width: 100%;
+            max-width: 340px;
             margin: 0 auto;
-            border: 10px solid #333;
-            border-radius: 30px;
+            border: 12px solid #1f2937;
+            border-radius: 36px;
             overflow: hidden;
             background: #000;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
-        .mobile-content { padding: 20px; }
+        .mobile-screen { padding: 20px; }
 
-        /* Action Bar */
+        /* Footer Actions */
         .action-bar {
             position: fixed;
             bottom: 0;
-            left: 350px; 
+            left: 340px;
             right: 0;
-            background: var(--panel);
+            background: var(--bg-panel);
             border-top: 1px solid var(--border);
-            padding: 15px 30px;
+            padding: 16px 24px;
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 16px;
             box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+            z-index: 10;
         }
 
         .btn {
@@ -176,35 +221,38 @@
             border-radius: 8px;
             border: none;
             font-weight: 600;
-            cursor: pointer;
             font-size: 14px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: transform 0.1s;
+            transition: transform 0.1s, background 0.2s;
         }
         .btn:active { transform: scale(0.98); }
         
-        .btn-desktop { background: #111; color: white; }
-        .btn-mobile { background: var(--primary); color: white; }
-        .btn-desktop:hover { background: #333; }
-        .btn-mobile:hover { background: var(--primary-hover); }
+        .btn-primary { background: var(--text-main); color: white; }
+        .btn-primary:hover { background: #000; }
+        
+        .btn-secondary { background: var(--primary); color: white; }
+        .btn-secondary:hover { background: var(--primary-hover); }
 
-        /* Toast Notification */
+        /* Toast */
         #toast {
             visibility: hidden;
-            min-width: 250px;
-            background-color: #333;
-            color: #fff;
+            min-width: 280px;
+            background-color: #10b981;
+            color: white;
             text-align: center;
             border-radius: 8px;
-            padding: 16px;
+            padding: 12px 24px;
             position: fixed;
             z-index: 100;
             left: 50%;
             bottom: 100px;
             transform: translateX(-50%);
             font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             opacity: 0;
             transition: opacity 0.3s, bottom 0.3s;
         }
@@ -213,7 +261,8 @@
         /* Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(2px);
             display: none;
             justify-content: center;
             align-items: center;
@@ -221,25 +270,43 @@
         }
         .modal {
             background: white;
-            padding: 30px;
-            border-radius: 12px;
-            max-width: 600px;
+            padding: 32px;
+            border-radius: 16px;
+            max-width: 550px;
             width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.3s ease-out;
         }
-        .modal h2 { margin-top: 0; color: #111; }
-        .modal ol { padding-left: 20px; line-height: 1.6; color: #444; }
-        .modal li { margin-bottom: 10px; }
-        .close-modal {
-            background: #eee; border: none; padding: 8px 16px;
-            border-radius: 6px; cursor: pointer; margin-top: 20px;
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal h2 { margin: 0 0 16px 0; font-size: 20px; }
+        .modal p { color: var(--text-secondary); line-height: 1.6; font-size: 14px; margin-bottom: 16px; }
+        .step-list { padding-left: 20px; margin: 0; color: var(--text-main); font-size: 14px; line-height: 1.6; }
+        .step-list li { margin-bottom: 12px; }
+        .close-btn {
+            margin-top: 24px;
+            width: 100%;
+            padding: 12px;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
         }
+        .close-btn:hover { background: #e5e7eb; }
 
-        @media (max-width: 768px) {
-            .workspace { flex-direction: column; }
-            .editor-panel { width: 100%; height: 300px; border-right: none; border-bottom: 1px solid var(--border); }
+        /* Responsive Adjustments */
+        @media (max-width: 1024px) {
+            .preview-area {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            .welcome-message-card { grid-column: 1; grid-row: 1; }
+            .desktop-card { grid-column: 1; grid-row: 2; }
+            .mobile-card { grid-column: 1; grid-row: 3; }
+            
+            .main-container { flex-direction: column; }
+            .sidebar { width: 100%; height: 300px; border-right: none; border-bottom: 1px solid var(--border); }
             .action-bar { left: 0; flex-direction: column; }
             .btn { width: 100%; justify-content: center; }
         }
@@ -291,64 +358,75 @@
         </svg>
         <div class="brand-text">
             <span class="brand-title">eSign Generator</span>
-        
+           
         </div>
     </div>
-    <button class="help-btn" onclick="toggleModal(true)">📖 Installation Guide</button>
+    <button class="btn-icon" onclick="toggleModal(true)">Installation Guide</button>
 </header>
 
-<div class="workspace">
-    <!-- Editor -->
-    <div class="editor-panel">
-        <div class="form-group">
+<div class="main-container">
+    <!-- Sidebar Editor -->
+    <div class="sidebar">
+        <div class="input-group">
             <label>Full Name</label>
-            <input type="text" id="inpName" value="Mantha S Murthy" oninput="update()">
+            <input type="text" id="inpName" value="Manikanta Prasad" oninput="update()">
         </div>
-        <div class="form-group">
+        <div class="input-group">
             <label>Job Title</label>
-            <input type="text" id="inpTitle" value="Managing Director" oninput="update()">
+            <input type="text" id="inpTitle" value="Senior Developer" oninput="update()">
         </div>
-        <div class="form-group">
-            <label>Phone</label>
-            <input type="text" id="inpPhone" value="+91 94696 46949" oninput="update()">
+        <div class="input-group">
+            <label>Phone Number</label>
+            <input type="text" id="inpPhone" value="+91 9876543210" oninput="update()">
         </div>
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="inpEmail" value="mantha.murthy@quantiratechnologies.com" oninput="update()">
+        <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" id="inpEmail" value="manikanta@quantiratechnologies.com" oninput="update()">
         </div>
-        <div class="form-group">
-            <label>Website</label>
+        <div class="input-group">
+            <label>Website URL</label>
             <input type="text" id="inpWeb" value="www.quantiratechnologies.com" oninput="update()">
         </div>
-        <div class="form-group">
-            <label>Address</label>
+        <div class="input-group">
+            <label>Office Address</label>
             <input type="text" id="inpAddr" value="K.Residency 1199, Flat no-501, Srinagar Colony Main Rd, Banjara Hills, Hyderabad, TS 500073" oninput="update()">
         </div>
-        <div style="margin-top:auto; font-size:11px; color:#999; line-height:1.4;">
+        <div style="margin-top:auto; font-size:12px; color:#9ca3af; line-height:1.5;">
             <p><strong>Note:</strong> This tool generates two separate HTML blocks. You must install both separately in Outlook.</p>
         </div>
     </div>
 
-    <!-- Preview -->
-    <div class="preview-panel">
+    <!-- Preview Area - Grid Layout -->
+    <div class="preview-area">
         
-        <!-- Desktop Preview -->
-        <div class="preview-card">
-            <div class="preview-label">
-                <span>DESKTOP PREVIEW (Outlook/Web)</span>
-                <span style="font-weight:400; color:#999;">Max Width: 600px</span>
+        <!-- 1. Welcome Message (Top Left) -->
+        <div class="preview-card welcome-message-card">
+            <div class="welcome-text">
+                <h3>👋 Welcome Aboard!</h3>
+<p>Please configure your email signature on both <b>Desktop 💻</b> and <b>Mobile 📱</b> to stay professional on every device!</p>
             </div>
-            <div class="preview-container" id="desktopPreview"></div>
+           
         </div>
 
-        <!-- Mobile Preview -->
-        <div class="preview-card">
-            <div class="preview-label">
-                <span>MOBILE PREVIEW (iOS/Android)</span>
-                <span style="font-weight:400; color:#999;">Width: 375px</span>
+        <!-- 2. Desktop Preview (Bottom Left) -->
+        <div class="preview-card desktop-card">
+            <div class="card-header">
+                <span class="card-title">Desktop Preview</span>
+                <span style="font-size:12px; color:#9ca3af;">Outlook / Web Client</span>
             </div>
-            <div class="mobile-wrapper">
-                <div class="mobile-content" id="mobilePreview"></div>
+            <div class="card-body" id="desktopPreview"></div>
+        </div>
+
+        <!-- 3. Mobile Preview (Right Column) -->
+        <div class="preview-card mobile-card">
+            <div class="card-header">
+                <span class="card-title">Mobile Preview</span>
+                <span style="font-size:12px; color:#9ca3af;">iOS / Android App</span>
+            </div>
+            <div class="card-body" style="background:#f9fafb;">
+                <div class="mobile-mockup">
+                    <div class="mobile-screen" id="mobilePreview"></div>
+                </div>
             </div>
         </div>
 
@@ -357,11 +435,11 @@
 
 <!-- Action Bar -->
 <div class="action-bar">
-    <button class="btn btn-desktop" onclick="copyToClipboard('desktop')">
+    <button class="btn btn-primary" onclick="copyToClipboard('desktop')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
         Copy Desktop Signature
     </button>
-    <button class="btn btn-mobile" onclick="copyToClipboard('mobile')">
+    <button class="btn btn-secondary" onclick="copyToClipboard('mobile')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
         Copy Mobile Signature
     </button>
@@ -373,17 +451,17 @@
 <!-- Modal -->
 <div class="modal-overlay" id="modal">
     <div class="modal">
-        <h2>How to Install in Outlook</h2>
-        <div style="background:#fff3cd; color:#856404; padding:10px; border-radius:6px; margin-bottom:15px; font-size:13px;">
-            <strong>Why two signatures?</strong> Outlook Desktop does not automatically resize signatures for mobile devices. To ensure your signature looks perfect on phones, you must create a separate "Mobile" signature in your Outlook Mobile App settings.
-        </div>
-        <ol>
+        <h2>How to Install</h2>
+        <p>Outlook does not automatically resize signatures for mobile. To ensure your signature looks perfect on all devices, you must set up two separate signatures.</p>
+        
+        <ol class="step-list">
             <li><strong>Copy Desktop:</strong> Click the black "Copy Desktop Signature" button above.</li>
             <li><strong>Paste in Outlook (PC/Mac):</strong> Go to <em>File > Options > Mail > Signatures</em>. Create a new signature named "Quantira Desktop" and paste (Ctrl+V).</li>
             <li><strong>Copy Mobile:</strong> Click the blue "Copy Mobile Signature" button above.</li>
             <li><strong>Paste in Outlook Mobile App:</strong> Open the Outlook app on your phone. Go to <em>Settings (Gear Icon) > Signature</em>. Paste the mobile version there.</li>
         </ol>
-        <button class="close-modal" onclick="toggleModal(false)">Close Guide</button>
+
+        <button class="close-btn" onclick="toggleModal(false)">Got it</button>
     </div>
 </div>
 
@@ -394,9 +472,6 @@
     };
 
     // Constants
-    // Note: For email signatures, it is safer to use the hosted PNG URL provided earlier 
-    // as some email clients block complex inline SVGs. 
-    // However, the SVG is used in the Tool Header as requested.
     const LOGO_URL = "https://plain-apac-prod-public.komododecks.com/202603/12/EuRzPVjDQIKG8T5PANzP/image.png";
     
     const SOCIALS = {
@@ -464,9 +539,9 @@
             </table>
           </td>
           
-          <!-- Divider -->
-          <td valign="middle" width="1" style="background-color: #444444; font-size: 0; line-height: 0;">
-            <div style="width: 1px; height: 130px; background-color: #444444;"></div>
+          <!-- FIXED VERTICAL DIVIDER: Using TD with Border instead of Div -->
+          <td valign="middle" width="1" style="border-left: 1px solid #555555; font-size: 0; line-height: 0;">
+            &nbsp;
           </td>
           
           <!-- Details Column -->
@@ -526,12 +601,14 @@
             </a>
           </td>
         </tr>
-        <!-- Divider -->
+        
+        <!-- FIXED HORIZONTAL DIVIDER: Using TD with Border instead of Div -->
         <tr>
-          <td style="padding-bottom: 15px;">
-            <div style="height: 1px; background-color: #444444; width: 100%;"></div>
+          <td style="border-top: 1px solid #555555; font-size: 0; line-height: 0; height: 15px;">
+            &nbsp;
           </td>
         </tr>
+        
         <!-- Name -->
         <tr>
           <td align="center" style="padding-bottom: 10px;">
