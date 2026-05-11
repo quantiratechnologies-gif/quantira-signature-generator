@@ -62,8 +62,6 @@
         button { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-copy { background: var(--primary); color: white; }
         .btn-share { background: var(--dark); color: white; }
-
-        .hidden-output { display: none; }
     </style>
 </head>
 <body>
@@ -101,8 +99,6 @@
     </div>
 </div>
 
-<div id="final-html" class="hidden-output"></div>
-
 <script>
     let currentMode = 'desktop';
 
@@ -133,7 +129,6 @@
         const isMobile = currentMode === 'mobile';
         const tableWidth = isMobile ? '100%' : '500px';
         
-        // Removed text-align: center; for left alignment on mobile
         const stackStyle = isMobile 
             ? 'display: block; width: 100%; border: none; padding: 0 0 20px 0; text-align: left;' 
             : 'width: 140px; padding-right: 20px; border-right: 1px solid #333; text-align: center;';
@@ -184,17 +179,25 @@
 </table>`;
         
         document.getElementById('sig-render-area').innerHTML = signatureHTML;
-        document.getElementById('final-html').innerHTML = signatureHTML;
     }
 
     function copyAction() {
-        const node = document.getElementById('final-html');
+        // Grab the visible signature element
+        const signatureElement = document.getElementById('sig-render-area');
+        
+        // Select the visible element (this ensures images and formatting copy perfectly)
         const range = document.createRange();
-        range.selectNode(node);
+        range.selectNode(signatureElement);
         window.getSelection().removeAllRanges();
         window.getSelection().addRange(range);
+        
+        // Execute copy
         document.execCommand('copy');
-        alert("Signature copied! Paste into Outlook settings.");
+        
+        // Clear the selection immediately so it doesn't stay highlighted
+        window.getSelection().removeAllRanges();
+        
+        alert("Signature copied! Paste directly into Outlook.");
     }
 
     function shareAction() {
