@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantira | Signature Manager Pro</title>
+    <style>
+        :root { --primary: #2c9cfb; --dark: #000000; --bg: #f0f2f5; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        
+        .header { 
+            background: var(--dark); 
+            padding: 15px 40px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 4px solid var(--primary);
+        }
+        .header img { height: 50px; width: auto; }
+        .header-title { color: white; font-size: 18px; font-weight: 300; letter-spacing: 1px; text-transform: uppercase; }
+
+        .container { max-width: 1100px; margin: 40px auto; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .main { display: grid; grid-template-columns: 320px 1fr; gap: 20px; padding: 30px; }
+        
+        @media (max-width: 900px) { 
+            .main { grid-template-columns: 1fr; } 
+            .header { flex-direction: column; text-align: left; gap: 10px; padding: 20px; align-items: flex-start; }
+        }
+
+        .editor { background: #f8f9fa; padding: 20px; border-radius: 15px; border: 1px solid #eee; }
+        h3 { margin: 0 0 20px 0; font-size: 14px; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 11px; font-weight: bold; color: #888; margin-bottom: 5px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        
+        .previews { display: flex; flex-direction: column; gap: 20px; align-items: center;}
+        .toggle-container { background: #eee; padding: 5px; border-radius: 50px; display: flex; gap: 5px; margin-bottom: 10px;}
+        .toggle-btn { padding: 8px 20px; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.3s; background: transparent; color: #666;}
+        .toggle-btn.active { background: var(--primary); color: white; }
+
+        .preview-window { 
+            background: #fff; 
+            border: 1px solid #eee; 
+            border-radius: 15px; 
+            padding: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            transition: all 0.4s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .preview-window.mobile-mode { 
+            max-width: 380px; 
+            padding: 15px;
+            background: #fafafa;
+            justify-content: flex-start; 
+        }
+
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        button { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-copy { background: var(--primary); color: white; }
+        .btn-share { background: var(--dark); color: white; }
+
+        .hidden-output { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <img src="https://plain-apac-prod-public.komododecks.com/202603/12/EuRzPVjDQIKG8T5PANzP/image.png" alt="Quantira Logo">
+    <div class="header-title">Email Signature Generator</div>
+</div>
+
+<div class="container">
+    <div class="main">
+        <div class="editor">
+            <h3>Employee Setup</h3>
+            <div class="input-group"><label>Full Name</label><input type="text" id="name" value="Saranya Atreyapurapu" oninput="render()"></div>
+            <div class="input-group"><label>Job Title</label><input type="text" id="role" value="HR Executive" oninput="render()"></div>
+            <div class="input-group"><label>Phone</label><input type="text" id="phone" value="+91 86395 05949" oninput="render()"></div>
+            <div class="input-group"><label>Email</label><input type="text" id="email" value="atreyapurapu.saranya@quantiratechnologies.com" oninput="render()"></div>
+            
+            <div class="actions">
+                <button class="btn-copy" onclick="copyAction()">📋 Copy</button>
+                <button class="btn-share" onclick="shareAction()">✉️ Share</button>
+            </div>
+        </div>
+
+        <div class="previews">
+            <div class="toggle-container">
+                <button id="deskBtn" class="toggle-btn active" onclick="setMode('desktop')">🖥️ Desktop</button>
+                <button id="mobBtn" class="toggle-btn" onclick="setMode('mobile')">📱 Mobile</button>
+            </div>
+
+            <div class="preview-window" id="preview-frame">
+                <div id="sig-render-area" style="width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="final-html" class="hidden-output"></div>
+
+<script>
+    let currentMode = 'desktop';
+
+    function setMode(mode) {
+        currentMode = mode;
+        const frame = document.getElementById('preview-frame');
+        const deskBtn = document.getElementById('deskBtn');
+        const mobBtn = document.getElementById('mobBtn');
+
+        if(mode === 'mobile') {
+            frame.classList.add('mobile-mode');
+            mobBtn.classList.add('active');
+            deskBtn.classList.remove('active');
+        } else {
+            frame.classList.remove('mobile-mode');
+            deskBtn.classList.add('active');
+            mobBtn.classList.remove('active');
+        }
+        render();
+    }
+
+    function render() {
+        const n = document.getElementById('name').value;
+        const r = document.getElementById('role').value;
+        const p = document.getElementById('phone').value;
+        const e = document.getElementById('email').value;
+
+        const isMobile = currentMode === 'mobile';
+        const tableWidth = isMobile ? '100%' : '500px';
+        
+        // Removed text-align: center; for left alignment on mobile
+        const stackStyle = isMobile 
+            ? 'display: block; width: 100%; border: none; padding: 0 0 20px 0; text-align: left;' 
+            : 'width: 140px; padding-right: 20px; border-right: 1px solid #333; text-align: center;';
+        
+        const detailsPadding = isMobile ? 'padding: 0;' : 'padding-left: 20px;';
+
+        const signatureHTML = `
+<table cellpadding="0" cellspacing="0" border="0" style="width: 100%; max-width: ${tableWidth}; font-family: 'Segoe UI', Arial, sans-serif; background-color: #000000; border-radius: 16px; color: #ffffff; border-collapse: separate;">
+  <tr>
+    <td style="padding: 25px;">
+      <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td valign="top" style="${stackStyle}">
+            <img src="https://plain-apac-prod-public.komododecks.com/202603/12/EuRzPVjDQIKG8T5PANzP/image.png" width="110" style="display: inline-block; border: 0; margin-bottom: 12px;">
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="padding: 0 4px;"><a href="#"><img src="https://img.icons8.com/ios-filled/50/2c9cfb/facebook-new.png" width="20"></a></td>
+                <td style="padding: 0 4px;"><a href="#"><img src="https://img.icons8.com/ios-filled/50/2c9cfb/linkedin.png" width="20"></a></td>
+                <td style="padding: 0 4px;"><a href="#"><img src="https://img.icons8.com/ios-filled/50/2c9cfb/instagram-new.png" width="20"></a></td>
+                <td style="padding: 0 4px;"><a href="#"><img src="https://img.icons8.com/ios-filled/50/2c9cfb/twitterx--v2.png" width="20"></a></td>
+              </tr>
+            </table>
+          </td>
+
+          <td valign="top" style="${isMobile ? 'display: block; width: 100%; text-align: left;' : 'text-align: left;'} ${detailsPadding}">
+            <h2 style="margin: 0; font-size: 18px; font-weight: bold; color: #ffffff; line-height: 1.2;">${n}</h2>
+            <p style="margin: 2px 0 12px 0; font-size: 13px; color: #2c9cfb; font-weight: 600;">${r}</p>
+            
+            <table cellpadding="0" cellspacing="0" border="0" style="font-size: 12px; color: #ffffff; line-height: 1.6;">
+              <tr>
+                <td width="22" valign="middle" align="center"><img src="https://img.icons8.com/ios-filled/50/2c9cfb/phone.png" width="12"></td>
+                <td style="padding-left: 5px;">${p}</td>
+              </tr>
+              <tr>
+                <td width="22" valign="middle" align="center"><img src="https://img.icons8.com/ios-filled/50/2c9cfb/new-post.png" width="12"></td>
+                <td style="padding-left: 5px;"><a href="mailto:${e}" style="color: #ffffff; text-decoration: none;">${e}</a></td>
+              </tr>
+              <tr>
+                <td width="22" valign="middle" align="center"><img src="https://img.icons8.com/ios-filled/50/2c9cfb/domain.png" width="12"></td>
+                <td style="padding-left: 5px;"><a href="https://www.quantiratechnologies.com" style="color: #ffffff; text-decoration: none;">quantiratechnologies.com</a></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`;
+        
+        document.getElementById('sig-render-area').innerHTML = signatureHTML;
+        document.getElementById('final-html').innerHTML = signatureHTML;
+    }
+
+    function copyAction() {
+        const node = document.getElementById('final-html');
+        const range = document.createRange();
+        range.selectNode(node);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+        alert("Signature copied! Paste into Outlook settings.");
+    }
+
+    function shareAction() {
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        copyAction();
+        window.location.href = `mailto:${email}?subject=Your Email Signature&body=Hi ${name}, I've copied your signature. Paste it below!`;
+    }
+
+    render();
+</script>
+</body>
+</html>
